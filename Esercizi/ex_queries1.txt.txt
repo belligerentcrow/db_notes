@@ -1,0 +1,118 @@
+SCHEMA RELAZIONALE:
+
+Studenti(Nome, Matricola, Indirizzo, Telefono);
+Corsi(Corso, Professore); 
+Esami(Corso, Matricola, Voto); 
+
+QUERY RICHIESTA: 
+
+Creare una query che restituisca: 
+Nome, matricola, voto minimo, voto massimo, voto medio, per gli studenti che hanno dato più di 8 materie
+
+QUERY: 
+
+SELECT s.nome, s.matricola, MIN(e.voto), MAX(e.voto), AVG(e.voto)
+FROM Studenti s, Esami e
+WHERE s.matricola = e.matricola
+GROUP BY s.matricola, s.nome
+HAVING COUNT(*) > 8
+
+***
+
+SCHEMA RELAZIONALE:
+
+Quadri(Pittore, Titolo, DataCreazione, NomeMuseo);
+Musei(NomeMuseo, Citta, Curatore); 
+Costo(Titolo, Prezzo); 
+
+QUERY RICHIESTA:	
+
+Elenco dei musei e del valore medio dei quadri posseduti
+
+QUERY: 
+
+SELECT DISTINCT q.NomeMuseo, AVG(prezzo)
+FROM Quadri q
+WHERE q.Titolo = c.Titolo
+GROUP BY q.NomeMuseo
+
+QUERY RICHIESTA: 
+
+II numero di quadri per ogni pittore fra tutti i musei parigini.
+
+QUERY: 
+
+SELECT q.Pittore, COUNT(*)
+FROM Quadri q, Musei m
+WHERE m.citta = "PARIGI"
+AND q.NomeMuseo = m.NomeMuseo
+GROUP BY q.pittore
+
+***
+
+SCHEMA RELAZIONALE:
+
+Maternita(Madre, Figlio); 
+Paternita(Padre, Figlio); 
+Persone(Nome, Eta, Reddito); 
+
+QUERY RICHIESTA: 
+
+I padri i cui figli guadagnano tutti più di 20
+
+SELECT DISTINCT Padre
+FROM paternita pa1
+WHERE NOT EXISTS (
+	SELECT *
+	FROM Paternita pa2, Persone pe
+	WHERE pa2.padre = pa1.padre
+	AND pa2.Figlio = pe.Nome
+	AND Reddito <= 20
+	)
+
+***
+
+SCHEMA RELAZIONALE: 
+
+Stanza(*ID*, numen, piano, letti*); --letti è numerico
+        Cliente(*CF*, nome, cognome, data nascita); 
+        Prenotazione(Data, --id_stanza--, --CF--, *ID_Pren*); 
+        Membri(*--ID_Prenot--, --CF--*);
+
+
+QUERY RICHIESTA:
+
+Trova i clienti che hanno prenotato tutte le stanze matrimonali/con due letti
+
+QUERY: 
+
+SELECT c.Nome, c.Cognome
+FROM Clienti c
+WHERE NOT EXISTS ( SELECT *
+	FROM Stanza s
+	WHERE s.letti = 2
+	AND NOT EXISTS ( SELECT * 
+		FROM Prenotazione p
+		WHERE s.ID = p.ID_Stanza
+		AND c.CF = p.CF
+		)
+	)
+
+QUERY RICHIESTA: 
+
+Trova tutti i clienti che hanno sempre prenotato con altri due ospiti
+
+QUERY (NON COMPLETA): 
+
+SELECT nome, cognome
+FROM cliente c
+WHERE NOT EXISTS ( SELECT * 
+	FROM prenotazione p
+	WHERE p.CF = c.CF 
+	AND NOT EXISTS ( SELECT * 
+		FROM Membri m
+		WHERE m.ID_pren = p.ID_pren
+		GROUP BY m.ID_pren 
+		HAVING COUNT(*) <> 3
+		)
+	)
