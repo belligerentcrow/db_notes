@@ -84,8 +84,88 @@ ORDER BY deptno, sal DESC;
 ## **JOIN**
 
 * Viene utilizzata per fare queries su più tabelle.
-* La condizione di JOIN va nella clausola WHERE. Se una colonna appare in più di una tabella, specifico a quale mi sto riferendo con un prefisso del nome della tabella corrispondente.
+* **La condizione di JOIN va nella clausola WHERE**. Se una colonna appare in più di una tabella, specifico a quale mi sto riferendo con un prefisso del nome della tabella corrispondente.
+
+Sintassi:
+  
+```sql
+SELECT t1.colonna, t2.colonna
+FROM t1, t2
+WHERE t1.colonna1 = t2.colonna2
+```
+
+Esempio:
+  
+```sql
+SELECT Professore, Corsi.Corso
+FROM Corsi, Esami, Studenti
+WHERE Corsi.Corso = Esami.Corso 
+AND Esami.Matricola = Studenti.Matricola
+AND Nome = 'Teo Verdi' 
+AND Voto > 24
+```
+
+***
+
+## **Natural Join**
+
+* Quando la prima tabella e la seconda tabella hanno un attributo in comune
+
+Es:
+  
+```sql
+SELECT emp.empno,   emp.ename, emp.deptno, dept.deptno, dept.loc
+FROM   emp, dept
+WHERE  emp.deptno=dept.deptno;
+```
+
+***
+
+## **Prodotto Cartesiano**
+
+* E' ottenuto quando
+  * Es: la prima tabella è di 13 righe e la seconda di 5. Allora la tabella della query viene di 13*5 colonne. 
+  * Una condizione Join è omessa --> Inserire condizioni Joins valide nella clausola WHERE! 
+  * Tutte le righe della prima tabella ammettono joins con tutte le righe della seconda
+
+***
+
+## **Join Esplicito - (JOIN ... ON ...)**
+
+Esempio di query uguali con due sintassi diverse (una con l'utilizzo della clausola WHERE e l'altra col JOIN ON):
+
+**Sintassi**:
 
 ```sql
+SELECT ...
+FROM  Tabella {... JOIN Tabella ON CondizioneDiJoin }
+[WHERE AltraCondizione]
+```
+
+
+> **Query**: Padre e madre di ogni persona
+
+Con WHERE:
+
+```sql
+SELECT paternita.figlio, padre, madre
+FROM maternita, paternita
+WHERE paternita.figlio = maternita.figlio
+```
+
+Con JOIN:
+
+```sql
+SELECT madre, paternita.figlio, padre
+FROM maternita JOIN paternita 
+ON paternita.figlio = maternita.figlio
+```
+
+//...
+
+> **Query**: "I padri che guadagnano più di 20
+
+```sql
+SELECT
 
 ```
