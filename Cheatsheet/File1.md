@@ -22,15 +22,24 @@
     - [**Esempi di uso operatori aggregati SUM() AVG() MAX() MIN()**](#esempi-di-uso-operatori-aggregati-sum-avg-max-min)
     - [**COUNT**](#count)
   - [**GROUP BY**](#group-by)
+  - [**HAVING**](#having)
+  - [**QUERY NIDIFICATE**](#query-nidificate)
+    - [**Confronto tra attributo e sottoselect**](#confronto-tra-attributo-e-sottoselect)
+      - [**Clausola ANY**](#clausola-any)
+      - [**Clausola ALL**](#clausola-all)
+    - [**QUANTIFICATORE ESISTENZIALE**](#quantificatore-esistenziale)
 
 ***
 
 ## **SELECT: BASICS**
 
 ```sql
-SELECT [DISTINCT] attributi
-FROM Tabelle
-[WHERE condizione]
+SELECT [DISTINCT] Lista_Attributi_O_Espressioni
+FROM Lista_Tabelle
+[WHERE Condizioni_Semplici]
+[GROUP BY Lista_Attributi_Di_Raggruppamento]
+[HAVING Condizioni_Aggregate]
+[ORDER BY Lista_Attributi_Di_Ordinamento]
 ```
 
 - E' possibile usare gli operatori aritmetici nella TargetList (Select)
@@ -313,7 +322,6 @@ FROM persone
 WHERE eta <30
 ```
 
-
 ***
 
 ### **COUNT**
@@ -344,3 +352,58 @@ FROM tables
 [WHERE etc]
 GROUP BY group_by_expression 
 ```
+
+**Esempio**:  
+
+```sql
+SELECT Padre, COUNT(*) AS NumFigli
+FROM paternita
+GROUP BY Padre
+```
+
+***
+
+## **HAVING**
+
+- Per restringere gruppi. Le righe sono raggruppate e possiamo utilizzare operatori aggregati.
+- Ammette una **Espressione BOOLEANA** (es: risultati di confronto)
+
+**Esempi**:
+  
+```sql
+SELECT deptno, MAX(sal)
+FROM emp
+GROUP BY deptNo
+HAVING MAX(sal)>2900
+```
+
+```sql
+SELECT job, SUM(sal) as Payroll
+FROM emp
+WHERE job NOT LIKE 'SALES%'
+HAVING SUM(sal)>5000
+ORDER BY SUM(sal);
+```
+
+***
+
+|**Fine primo powerpoint e inizio secondo**|
+
+**
+
+## **QUERY NIDIFICATE**
+
+### **Confronto tra attributo e sottoselect**
+
+- ```attributo <= / >= / <> / = / < / > (Sottoselect)```
+- La sottoselect deve restituire una tabella **con un solo elemento o vuota**
+
+#### **Clausola ANY**
+
+Il predicato è vero se **almeno uno dei valori** restituiti dalla query soddisfano la condizione
+
+#### **Clausola ALL**
+
+Il predicato è vero se **tutti i valori** restituiti dalla query soddisfano la condizione
+
+### **QUANTIFICATORE ESISTENZIALE**

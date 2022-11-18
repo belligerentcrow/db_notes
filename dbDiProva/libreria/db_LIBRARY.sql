@@ -66,3 +66,23 @@ PRIMARY KEY (`ID_Transaction_Single`),
 FOREIGN KEY (`SoldByEmployee`) REFERENCES `staff`(`empID`)
 )
 ENGINE = InnoDB;
+
+---------
+
+INSERT INTO `staff` (`empID`, `SurnameName`, `Pay`, `FreeDay`) VALUES ('0001', 'ELIZABETH, SMITH', '1000', 'THU');
+INSERT INTO `staff` (`empID`, `SurnameName`, `Pay`, `FreeDay`) VALUES ('0002', 'ALICE, JOHNSON', '800', 'TUE');
+INSERT INTO `staff` (`empID`, `SurnameName`, `Pay`, `FreeDay`) VALUES ('0003', 'NANCY, GRAYSON', '700', 'WED');
+INSERT INTO `staff` (`empID`, `SurnameName`, `Pay`, `FreeDay`) VALUES ('0004', 'JOHN, SMITH', '600', 'MON');
+INSERT INTO `staff` (`empID`, `SurnameName`, `Pay`, `FreeDay`) VALUES ('0005', 'ELIZABETH, LONGCASTLE', '1000', 'SAT');
+INSERT INTO `staff` (`empID`, `SurnameName`, `Pay`, `FreeDay`) VALUES ('0006', 'MARY, LAMB', '700', 'WED');
+
+----------
+
+INSERT INTO `author`(`AuthorNameSurname`, `Location`) VALUES ('MARY SHELLEY', 'ENGLAND');
+INSERT INTO `author` (`AuthorNameSurname`, `Location`,`email`) VALUES ('TATSUKI FUJIMOTO', 'JAPAN', 'tatsfuji@jap.com');
+INSERT INTO `author` (`AuthorNameSurname`, `Location`) VALUES ('RENE GIRARD', 'FRANCE');
+INSERT INTO `author` (`AuthorNameSurname`, `Location`, `email`) VALUES ('VIRGINIA WOOLF', 'ENGLAND', 'awooolf@eng.com');
+INSERT INTO `author` (`AuthorNameSurname`, `Location`) VALUES ('ERODOTO', 'GREECE');
+INSERT INTO `author` (`AuthorNameSurname`, `Location`) VALUES ('DONNA TARTT', 'USA');
+
+
