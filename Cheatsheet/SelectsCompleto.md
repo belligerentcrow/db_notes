@@ -24,10 +24,14 @@
   - [**GROUP BY**](#group-by)
   - [**HAVING**](#having)
   - [**QUERY NIDIFICATE**](#query-nidificate)
+    - [**Comportamento dei valori NULL nelle sottoselect**](#comportamento-dei-valori-null-nelle-sottoselect)
     - [**Confronto tra attributo e sottoselect**](#confronto-tra-attributo-e-sottoselect)
       - [**Clausola ANY**](#clausola-any)
       - [**Clausola ALL**](#clausola-all)
+      - [**Attributo [NOT] IN (SOTTOSELECT)**](#attributo-not-in-sottoselect)
     - [**QUANTIFICATORE ESISTENZIALE**](#quantificatore-esistenziale)
+    - [**Esempi di sottoqueries nidificate**](#esempi-di-sottoqueries-nidificate)
+    - [**Quantificatore Universale / Quoziente**](#quantificatore-universale--quoziente)
 
 ***
 
@@ -387,11 +391,72 @@ ORDER BY SUM(sal);
 
 ***
 
-|**Fine primo powerpoint e inizio secondo**|
+.  
+.  
+|**Fine primo powerpoint e inizio secondo**|  
+.  
+.  
 
-**
+***
 
 ## **QUERY NIDIFICATE**
+
+- Meno dichiarative ma più facilmente interpretabili: Suddivise in blocchi
+  - Tuttavia, query nidificate più complesse possono essere di difficile comprensione.
+- Può essere combinata con la forma piana
+- Le sottoquery **NON POSSONO contenere operatori insiemistici**, "l'unione si fa solo al livello esterno".
+- Non è possibile fare riferimento a variabili fuori scope (in blocchi più interni, come gli altri linguaggi)
+
+- La Query interna può usare variabili della query esterna
+- La Query interna viene eseguita una volta per ciascun record della query esterna
+
+```sql
+
+-- STUDENTI CHE HANNO UN OMONIMO
+SELECT *
+FROM Student S
+WHERE EXISTS (SELECT *
+    FROM Student S2
+    WHERE S2.Nome = S.Nome
+    AND   S2.Cognome = S.Cognome
+    AND   S2.Matricola <> S.Matricola
+    )
+
+--- VS ---
+
+-- STUDENTI CHE *NON* HANNO UN OMONIMO 
+SELECT *
+FROM Student S
+WHERE NOT EXISTS (SELECT *
+    FROM  Student S2
+    WHERE S2.Nome = S.Nome
+    AND   S2.Cognome = S.Cognome
+    AND   S2.Matricola <> S.Matricola
+    )
+
+```
+
+***
+
+### **Comportamento dei valori NULL nelle sottoselect**
+
+- ```Espr. [operaz.] (Sottoselect)```
+  - Vale unknown SE
+    - espr. è NULL
+    - la sottoselect produce una tabella/insieme vuoti
+
+- ```Espr. IN (Sottoselect)```
+- ```Espr. [op] ANY (Sottoselect)```
+  - Valgono unknown SE
+    - Espr. è NULL
+    - se NULL è fra i valori della Sottoselect e il predicato è falso per i NOT NULL.
+
+- ```Espr. [op] ALL (Sottoselect)```
+  - Vale Unknown SE
+    - Espr. è NULL
+    - se NULL è fra i valori della Sottoselect
+
+***
 
 ### **Confronto tra attributo e sottoselect**
 
@@ -406,4 +471,99 @@ Il predicato è vero se **almeno uno dei valori** restituiti dalla query soddisf
 
 Il predicato è vero se **tutti i valori** restituiti dalla query soddisfano la condizione
 
+```Attributo [operaz.] [ANY|ALL] (SOTTOSELECT)```
+
+#### **Attributo [NOT] IN (SOTTOSELECT)**
+
+(as it says on the tin)
+
+***
+
 ### **QUANTIFICATORE ESISTENZIALE**
+
+```EXISTS```
+
+Il predicato è vero se la sottoselect restituisce **ALMENO UNA TUPLA**
+
+```NOT EXISTS```
+
+Il predicato è vero se la sottoselect **non restituisce tuple**, ovvero se restituisce **l'insieme vuoto**.
+
+Esempio:  
+
+```sql
+SELECT *
+FROM persone
+WHERE EXISTS( SELECT *
+      FROM Paternita
+      WHERE Padre = Nome)
+  OR
+  EXISTS ( SELECT *
+      FROM Maternita
+      WHERE Madre = Nome)
+```
+
+***
+
+### **Esempi di sottoqueries nidificate**
+  
+***Es**: tre query "sinonime"*
+  
+```sql
+SELECT P.Nome, P.Reddito
+FROM Persone P, Paternita, Persone F
+WHERE P.Nome = Padre 
+AND Figlio = F.Nome
+AND F.Reddito > 20
+
+SELECT Nome, Reddito
+FROM Persone
+WHERE Nome in (SELECT Padre
+      FROM Paternita
+      WHERE Figlio = any (SELECT Nome
+            FROM Persone
+            WHERE Reddito > 20
+            )
+      )
+
+SELECT Nome, Reddito
+FROM Persone
+WHERE Nome in ( SELECT Padre
+      FROM Paternita, Persone
+      WHERE Figlio = Nome
+      AND Reddito > 20
+)
+
+```
+
+***
+
+### **Quantificatore Universale / Quoziente**
+
+```SQL
+Agenti(CodiceAgente, Nome, Zona, Supervisore, Commissione);
+Clienti(CodiceCliente, Nome, Citta, Sconto);
+Ordini(CodiceOrdine, CodiceCliente, CodiceAgente, Articolo, Data, Ammontare);
+```
+
+Esempio:
+
+- Trova tutti i clienti che hanno fatto ordini a TUTTI gli agenti di Catania  
+  - Implica che per ogni agente Z di Catania esiste un ordine Y del cliente X fatto con Z.  
+    - Per ogni agente Z esiste cliente Y, con Y(n, x, z, p, d, a)
+  - Il che è equivalente a dire che non esista un agente Z tale che cliente Y non abbia fatto un ordine con tale agente Z.  
+    - Non esiste Z per il quale non esiste Y, con Y (n, x, z, p, d, a)
+
+```sql
+SELECT C.CodiceCliente
+FROM Clienti C
+WHERE NOT EXISTS ( SELECT * 
+      FROM Agenti A
+      WHERE A.Zona = 'Catania'
+      AND NOT EXISTS( SELECT *
+            FROM Ordini V
+            WHERE V.CodiceCliente = C.CodiceCliente
+            AND V.CodiceCliente = A.CodiceAgente
+            )
+      )
+```
