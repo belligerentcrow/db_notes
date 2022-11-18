@@ -3,6 +3,7 @@
 ***
 
 **INDICE**: ☝️
+
 - [**SELECT**](#select)
   - [**SELECT: BASICS**](#select-basics)
   - [**Predicati di confronto**](#predicati-di-confronto)
@@ -18,7 +19,9 @@
     - [**UNION JOIN**](#union-join)
   - [**UNIONE (vera e propria)**](#unione-vera-e-propria)
   - [**OPERATORI AGGREGATI**](#operatori-aggregati)
-
+    - [**Esempi di uso operatori aggregati SUM() AVG() MAX() MIN()**](#esempi-di-uso-operatori-aggregati-sum-avg-max-min)
+    - [**COUNT**](#count)
+  - [**GROUP BY**](#group-by)
 
 ***
 
@@ -30,20 +33,20 @@ FROM Tabelle
 [WHERE condizione]
 ```
 
-* E' possibile usare gli operatori aritmetici nella TargetList (Select)
-* E' possibile **rinominare una colonna** utilizzando "**AS**". Ciò è anche utile per prevenire casi di conflitto a causa di omonimie. 
-  * ```SELECT ename AS name```
-  * ```SELECT sal salary```
-* Specificando **DISTINCT**, i record uguali vengono mostrati una sola volta.
-* nella **WHERE** applico i predicati di confronto.
+- E' possibile usare gli operatori aritmetici nella TargetList (Select)
+- E' possibile **rinominare una colonna** utilizzando "**AS**". Ciò è anche utile per prevenire casi di conflitto a causa di omonimie.
+  - ```SELECT ename AS name```
+  - ```SELECT sal salary```
+- Specificando **DISTINCT**, i record uguali vengono mostrati una sola volta.
+- nella **WHERE** applico i predicati di confronto.
 
 ***
 
 ## **Predicati di confronto**
 
-* Confronto "classico" --> ```<, >, <=, >=, =, <>```
+- Confronto "classico" --> ```<, >, <=, >=, =, <>```
 
-* ```BETWEEN ...  AND  ...``` --> Compreso tra due valori
+- ```BETWEEN ...  AND  ...``` --> Compreso tra due valori
 
 ```sql
 SELECT ename, sal
@@ -51,7 +54,7 @@ FROM emp
 WHERE sal BETWEEN 1000 AND 1500;
 ```
 
-* ```IN (list)``` --> corrispondente a uno dei valori della lista. 
+- ```IN (list)``` --> corrispondente a uno dei valori della lista.
 
 ```sql
 SELECT empno, ename, sal, mgr
@@ -59,9 +62,9 @@ FROM emp
 WHERE mgr IN (3834, 2814, 4389);
 ```
 
-* ```LIKE``` --> Operatore di pattern matching, sorta di REGEX. Può essere combinato.
-  * ```%``` denota zero o più caratteri
-  * ```_``` denota un carattere
+- ```LIKE``` --> Operatore di pattern matching, sorta di REGEX. Può essere combinato.
+  - ```%``` denota zero o più caratteri
+  - ```_``` denota un carattere
 
 ```sql
 SELECT ename
@@ -69,8 +72,8 @@ FROM emp
 WHERE ename LIKE '%S'; 
 ```
 
-* ```IS NULL``` --> Valore nullo.
-  * ```Espr IS [NOT] NULL```
+- ```IS NULL``` --> Valore nullo.
+  - ```Espr IS [NOT] NULL```
 
 ```sql
 SELECT Nome
@@ -80,20 +83,20 @@ WHERE Telefono IS NOT NULL;
 
 ***
 
-## **Operatori Logici** 
+## **Operatori Logici**
 
-* i "classici" ```NOT, AND, OR```, in precedenza come elencati
+- i "classici" ```NOT, AND, OR```, in precedenza come elencati
 
 ***
 
 ## **Clausola ORDER BY**
   
-* Ordina le righe.  
-  * **ASC**: in ordine crescente, default.  
-  * **DESC**: in ordine decrescente.  
+- Ordina le righe.  
+  - **ASC**: in ordine crescente, default.  
+  - **DESC**: in ordine decrescente.  
 
-* E' possibile ordinare tramite alias
-* E' possibile ordinare l'ordinamento specificando due attributi
+- E' possibile ordinare tramite alias
+- E' possibile ordinare l'ordinamento specificando due attributi
 
 ```sql
 SELECT ename, deptno, sal
@@ -105,8 +108,8 @@ ORDER BY deptno, sal DESC;
 
 ## **JOIN**
 
-* Viene utilizzata per fare queries su più tabelle.
-* **La condizione di JOIN va nella clausola WHERE**. Se una colonna appare in più di una tabella, specifico a quale mi sto riferendo con un prefisso del nome della tabella corrispondente.
+- Viene utilizzata per fare queries su più tabelle.
+- **La condizione di JOIN va nella clausola WHERE**. Se una colonna appare in più di una tabella, specifico a quale mi sto riferendo con un prefisso del nome della tabella corrispondente.
 
 Sintassi:
   
@@ -131,7 +134,7 @@ AND Voto > 24
 
 ## **Natural Join**
 
-* Quando la prima tabella e la seconda tabella hanno un attributo in comune
+- Quando la prima tabella e la seconda tabella hanno un attributo in comune
 
 Es:
   
@@ -152,10 +155,10 @@ FROM Esami NATURAL JOIN Studenti
 
 ```CROSS JOIN```
 
-* E' ottenuto quando
-  * Es: la prima tabella è di 13 righe e la seconda di 5. Allora la tabella della query viene di 13*5 colonne. 
-  * Una condizione Join è omessa --> Inserire condizioni Joins valide nella clausola WHERE! 
-  * Tutte le righe della prima tabella ammettono joins con tutte le righe della seconda
+- E' ottenuto quando
+  - Es: la prima tabella è di 13 righe e la seconda di 5. Allora la tabella della query viene di 13*5 colonne.
+  - Una condizione Join è omessa --> Inserire condizioni Joins valide nella clausola WHERE!
+  - Tutte le righe della prima tabella ammettono joins con tutte le righe della seconda
 
 ***
 
@@ -170,7 +173,6 @@ SELECT ...
 FROM  Tabella {... JOIN Tabella ON CondizioneDiJoin }
 [WHERE AltraCondizione]
 ```
-
 
 > **Query**: Padre e madre di ogni persona
 
@@ -213,15 +215,15 @@ WHERE reddito >20
 
 ```JOIN ... USING ...```
 
-* La **Natural Join** sugli attributi specificati nella clausola USING (un sottoinsieme di quelli **in comune**) presenti in entrambe le tabelle
+- La **Natural Join** sugli attributi specificati nella clausola USING (un sottoinsieme di quelli **in comune**) presenti in entrambe le tabelle
 
 ```JOIN ... ON ...```
 
-* Una Join su quelli **che soddisfano una certa condizione**
+- Una Join su quelli **che soddisfano una certa condizione**
 
 ```LEFT JOIN / RIGHT JOIN / FULL JOIN```
 
-* Usato con Natural Join o Join, è la giunzione esterna nelle tre modalità
+- Usato con Natural Join o Join, è la giunzione esterna nelle tre modalità
 
 ### **LEFT JOIN**
 
@@ -247,14 +249,14 @@ ON maternita.figlio = paternita.figlio
 
 ### **UNION JOIN**
 
-* E' l'**unione esterna**, ovvero quando le due tabelle si estendono con le colonne dell'altro in valori nulli; una unione
+- E' l'**unione esterna**, ovvero quando le due tabelle si estendono con le colonne dell'altro in valori nulli; una unione
 
 ***
 
 ## **UNIONE (vera e propria)**
 
-* I duplicati vengono eliminati: per mantenerli, specificare ```UNION ALL```
-* Esistono anche ```INTERSECT [ALL]``` e ```EXCEPT [ALL]```  
+- I duplicati vengono eliminati: per mantenerli, specificare ```UNION ALL```
+- Esistono anche ```INTERSECT [ALL]``` e ```EXCEPT [ALL]```  
 
 Sintassi:  
 
@@ -268,8 +270,8 @@ SELECT
 
 ```
 
-* Attenzione alla **notazione posizionale**.
-* Corretto uso della UNION:
+- Attenzione alla **notazione posizionale**.
+- Corretto uso della UNION:
 
 ```sql
 SELECT padre AS genitore, figlio
@@ -283,3 +285,62 @@ FROM maternita
 
 ## **OPERATORI AGGREGATI**
 
+- E' possibile metterli solo nella TargetList
+- Non sono rappresentabili in algebra relazionale
+- **AVG()**, **COUNT()**, **MAX()**, **MIN()**, **SUM()**
+- Tutti tranne **COUNT()** Possono essere usati su dati numerici.
+- **MIN()** e **MAX()** su dati di qualsiasi tipo.
+- Se una colonna contiene solo valori nulli, **MIN()**, **MAX()**, **AVG()**, **SUM()** Restituiscono NULL, mentre **COUNT()** restituisce zero.
+- **AVG()** e **SUM()** ignorano i valori nulli.
+
+### **Esempi di uso operatori aggregati SUM() AVG() MAX() MIN()**
+
+```sql
+SELECT AVG(reddito)
+FROM persone
+WHERE eta <30
+```
+
+```sql
+SELECT AVG(reddito)
+FROM persone JOIN paternita ON nome=figlio
+WHERE padre='FRANCO'
+```
+
+```sql
+SELECT AVG(reddito), MIN(reddito), MAX(reddito)
+FROM persone
+WHERE eta <30
+```
+
+
+***
+
+### **COUNT**
+
+- **COUNT()** ritorna il numero di righe di una tabella.
+- ```SELECT COUNT(*) FROM persone``` Ritorna il numero di tuple.
+- ```SELECT COUNT(reddito) FROM persone``` Ritorna il numero di volte in cui "Reddito" non sia NULL
+- ```SELECT COUNT(DISTINCT Reddito) FROM persone``` Numero di valori DISTINTI del campo reddito (che non siano NULL), ovvero tipo le classi di equivalenza dei redditi, le tiers di redditi possibili
+
+***
+
+## **GROUP BY**
+
+- Divide le righe in gruppi più piccoli
+- **Importante**: tutte le colonne della SELECT che non sono in funzioni di gruppo **DEVONO ESSERE NELLA GROUP BY**
+- La colonna per cui raggruppo non dev'essere necessariamente nella SELECT
+
+- Posso raggruppare per più di un attributo
+  - ```SELECT deptno, job, sum(sal)```
+  - ```FROM emp```
+  - ```GROUP BY deptno, job;```
+
+**Sintassi**:
+
+```sql
+SELECT column, group_function(column)
+FROM tables
+[WHERE etc]
+GROUP BY group_by_expression 
+```
