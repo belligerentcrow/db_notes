@@ -1,6 +1,28 @@
-# **CHEATSHEET - DB**
+# **SELECT**
 
-## **SELECT**
+***
+
+**INDICE**: ☝️
+- [**SELECT**](#select)
+  - [**SELECT: BASICS**](#select-basics)
+  - [**Predicati di confronto**](#predicati-di-confronto)
+  - [**Operatori Logici**](#operatori-logici)
+  - [**Clausola ORDER BY**](#clausola-order-by)
+  - [**JOIN**](#join)
+  - [**Natural Join**](#natural-join)
+  - [**Prodotto Cartesiano**](#prodotto-cartesiano)
+  - [**Join Esplicito - (JOIN ... ON ...)**](#join-esplicito---join--on-)
+  - [**JOINS**](#joins)
+    - [**LEFT JOIN**](#left-join)
+    - [**FULL JOIN**](#full-join)
+    - [**UNION JOIN**](#union-join)
+  - [**UNIONE (vera e propria)**](#unione-vera-e-propria)
+  - [**OPERATORI AGGREGATI**](#operatori-aggregati)
+
+
+***
+
+## **SELECT: BASICS**
 
 ```sql
 SELECT [DISTINCT] attributi
@@ -119,9 +141,16 @@ FROM   emp, dept
 WHERE  emp.deptno=dept.deptno;
 ```
 
+```sql
+SELECT Studenti.Nome, Esami.Corso, Esami.Voto
+FROM Esami NATURAL JOIN Studenti
+```
+
 ***
 
 ## **Prodotto Cartesiano**
+
+```CROSS JOIN```
 
 * E' ottenuto quando
   * Es: la prima tabella è di 13 righe e la seconda di 5. Allora la tabella della query viene di 13*5 colonne. 
@@ -166,6 +195,91 @@ ON paternita.figlio = maternita.figlio
 > **Query**: "I padri che guadagnano più di 20
 
 ```sql
+SELECT DISTINCT padre
+FROM persone, paternita
+WHERE figlio = nome AND reddito >20
+```
+
+```sql
+SELECT DISTINCT padre
+FROM persone 
+JOIN paternita ON figlio = nome
+WHERE reddito >20
+```
+
+***
+
+## **JOINS**
+
+```JOIN ... USING ...```
+
+* La **Natural Join** sugli attributi specificati nella clausola USING (un sottoinsieme di quelli **in comune**) presenti in entrambe le tabelle
+
+```JOIN ... ON ...```
+
+* Una Join su quelli **che soddisfano una certa condizione**
+
+```LEFT JOIN / RIGHT JOIN / FULL JOIN```
+
+* Usato con Natural Join o Join, è la giunzione esterna nelle tre modalità
+
+### **LEFT JOIN**
+
+```sql
+SELECT paternita.figlio, padre, madre
+FROM paternita LEFT JOIN maternita ON paternita.figlio = maternita.figlio
+```
+
+> **Query**: Codice agente ed ammontare degli agenti incluso quelli che non hanno effettuato ordini (avranno ammontare NULL)
+
+```sql
+SELECT Agenti.CodiceAgente, Ordini.Ammontare
+FROM Agenti NATURAL LEFT JOIN Ordini
+```
+
+### **FULL JOIN**
+
+```sql
+SELECT paternita.figlio, padre, madre
+FROM maternita FULL JOIN paternita
+ON maternita.figlio = paternita.figlio
+```
+
+### **UNION JOIN**
+
+* E' l'**unione esterna**, ovvero quando le due tabelle si estendono con le colonne dell'altro in valori nulli; una unione
+
+***
+
+## **UNIONE (vera e propria)**
+
+* I duplicati vengono eliminati: per mantenerli, specificare ```UNION ALL```
+* Esistono anche ```INTERSECT [ALL]``` e ```EXCEPT [ALL]```  
+
+Sintassi:  
+
+```sql
+
+SELECT
+... 
+UNION
+... 
 SELECT
 
 ```
+
+* Attenzione alla **notazione posizionale**.
+* Corretto uso della UNION:
+
+```sql
+SELECT padre AS genitore, figlio
+FROM paternita
+UNION
+SELECT madre as genitore, figlio
+FROM maternita
+```
+
+***
+
+## **OPERATORI AGGREGATI**
+
