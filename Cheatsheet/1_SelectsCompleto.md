@@ -6,7 +6,9 @@
 
 - [**SELECT**](#select)
   - [**SELECT: BASICS**](#select-basics)
-  - [**Predicati di confronto**](#predicati-di-confronto)
+    - [**DISTINCT**](#distinct)
+- [**WHERE**](#where)
+  - [**Predicati di confronto {Between...AND..., IN(list), LIKE, IS NULL}**](#predicati-di-confronto-betweenand-inlist-like-is-null)
   - [**Operatori Logici**](#operatori-logici)
   - [**Clausola ORDER BY**](#clausola-order-by)
   - [**JOIN**](#join)
@@ -46,20 +48,35 @@ FROM Lista_Tabelle
 [ORDER BY Lista_Attributi_Di_Ordinamento]
 ```
 
+1. Prende tutte le tabelle da **FROM**, ne fa il ***prodotto cartesiano***
+2. Vengono applicate le condizioni di **WHERE**
+3. Alla fine identifica gli attributi da **SELECT** ovvero dalla targetlist
+
+- I comandi in SQL non sono case sensitive
+- E' meglio distribuire su più righe
+- La '*' visualizza tutti gli attributi della tabella
 - E' possibile usare gli operatori aritmetici nella TargetList (Select)
-- E' possibile **rinominare una colonna** utilizzando "**AS**". Ciò è anche utile per prevenire casi di conflitto a causa di omonimie.
+- E' possibile **rinominare una colonna** con **ALIAS** utilizzando "**AS**". Ciò è anche utile per prevenire casi di conflitto a causa di omonimie.
   - ```SELECT ename AS name```
   - ```SELECT sal salary```
 - Specificando **DISTINCT**, i record uguali vengono mostrati una sola volta.
 - nella **WHERE** applico i predicati di confronto.
 
+### **DISTINCT**
+
+- Si può usare ```DISTINCT``` per fare visualizzare solo i valori distinti: Comprime i valori uguali e ne stampa solo uno per ogni tipo di attributo
+- Funziona su tutti gli attributi listati. Tutte le righe che ottengo come output devono avere valori diversi negli attributi
+
 ***
 
-## **Predicati di confronto**
+# **WHERE**
+
+## **Predicati di confronto {Between...AND..., IN(list), LIKE, IS NULL}**
 
 - Confronto "classico" --> ```<, >, <=, >=, =, <>```
 
 - ```BETWEEN ...  AND  ...``` --> Compreso tra due valori
+  - BETWEEN = limite superiore AND limite inferiore
 
 ```sql
 SELECT ename, sal
@@ -67,7 +84,9 @@ FROM emp
 WHERE sal BETWEEN 1000 AND 1500;
 ```
 
-- ```IN (list)``` --> corrispondente a uno dei valori della lista.
+- ```IN (list)``` --> corrispondente a uno dei valori della lista
+  - Specifico una serie di valori, lista statica (possono essere anche dinamiche)
+  - Una sorta di OR compatta
 
 ```sql
 SELECT empno, ename, sal, mgr
@@ -78,6 +97,8 @@ WHERE mgr IN (3834, 2814, 4389);
 - ```LIKE``` --> Operatore di pattern matching, sorta di REGEX. Può essere combinato.
   - ```%``` denota zero o più caratteri
   - ```_``` denota un carattere
+  - Lo spazio è considerato un carattere
+  - E' possibile combinare con il NOT
 
 ```sql
 SELECT ename
@@ -85,7 +106,7 @@ FROM emp
 WHERE ename LIKE '%S'; 
 ```
 
-- ```IS NULL``` --> Valore nullo.
+- ```IS NULL``` --> consente/non consente il valore NULL
   - ```Espr IS [NOT] NULL```
 
 ```sql
@@ -104,12 +125,13 @@ WHERE Telefono IS NOT NULL;
 
 ## **Clausola ORDER BY**
   
-- Ordina le righe.  
+- Ordina le righe. Ultima in assoluto a computare
   - **ASC**: in ordine crescente, default.  
   - **DESC**: in ordine decrescente.  
 
 - E' possibile ordinare tramite alias
 - E' possibile ordinare l'ordinamento specificando due attributi
+- Non posso ordinare per qualcosa che non mostro nella query
 
 ```sql
 SELECT ename, deptno, sal
@@ -299,6 +321,7 @@ FROM maternita
 ## **OPERATORI AGGREGATI**
 
 - E' possibile metterli solo nella TargetList
+- Costosi computazionalmente
 - Non sono rappresentabili in algebra relazionale
 - **AVG()**, **COUNT()**, **MAX()**, **MIN()**, **SUM()**
 - Tutti tranne **COUNT()** Possono essere usati su dati numerici.
@@ -406,6 +429,8 @@ ORDER BY SUM(sal);
 - Può essere combinata con la forma piana
 - Le sottoquery **NON POSSONO contenere operatori insiemistici**, "l'unione si fa solo al livello esterno".
 - Non è possibile fare riferimento a variabili fuori scope (in blocchi più interni, come gli altri linguaggi)
+- Non posso usare funzioni di raggruppamento con una query annidata
+  - ```MAX(AVG(voto))``` è errata!!!
 
 - La Query interna può usare variabili della query esterna
 - La Query interna viene eseguita una volta per ciascun record della query esterna
@@ -465,8 +490,10 @@ WHERE NOT EXISTS (SELECT *
 
 #### **Clausola ANY**
 
-Il predicato è vero se **almeno uno dei valori** restituiti dalla query soddisfano la condizione
+Il predicato è vero se **almeno uno dei valori** restituiti dalla query soddisfano la condizione  
 
+Stampa/Seleziona tutti i record che soddisfano una condizione
+  
 #### **Clausola ALL**
 
 Il predicato è vero se **tutti i valori** restituiti dalla query soddisfano la condizione
@@ -483,13 +510,31 @@ Il predicato è vero se **tutti i valori** restituiti dalla query soddisfano la 
 
 ```EXISTS```
 
-Il predicato è vero se la sottoselect restituisce **ALMENO UNA TUPLA**
+- Il predicato è vero se la sottoselect restituisce **ALMENO UNA TUPLA**
+- Non ci interessa COSA restituisca, ma che restituisca QUALCOSA
 
 ```NOT EXISTS```
 
-Il predicato è vero se la sottoselect **non restituisce tuple**, ovvero se restituisce **l'insieme vuoto**.
+- Il predicato è vero se la sottoselect **non restituisce tuple**, ovvero se restituisce **l'insieme vuoto**.
+- Esempio: "Dipendente con reddito più alto == **non esiste** nessuno con il reddito maggiore del suo"
+- La ```NOT EXISTS``` vuole sempre la STAR in SELECT ( ``` SELECT * ``` )
+
+- una ```NOT EXISTS`` è vera quando la sottoquery restituisce l'insieme vuoto
+- una ```NOT EXISTS``` è falsa quando la sottoquery restituisce qualcosa di diverso dall'insieme vuoto
 
 Esempio:  
+
+```sql
+    SELECT deptno
+    FROM employee e
+    WHERE NOT EXISTS (
+        SELECT * 
+        FROM employee
+        WHERE sal > e.sal
+    )
+```
+
+Esempio 2:
 
 ```sql
 SELECT *
