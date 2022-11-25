@@ -6,13 +6,16 @@
 
 - [**ADMINISTRATION**](#administration)
   - [**Intro amministrazione Server**](#intro-amministrazione-server)
-  - [**VINCOLI**](#vincoli)
   - [**CREATE/DROP SCHEMA**](#createdrop-schema)
     - [**RESTRICT, CASCADE**](#restrict-cascade)
   - [**CREATE TABLE**](#create-table)
   - [**Domini**](#domini)
     - [**Domini elementari**](#domini-elementari)
     - [**Domini user-defined**](#domini-user-defined)
+  - [**VINCOLI**](#vincoli)
+    - [**VINCOLI su un record**](#vincoli-su-un-record)
+    - [**VINCOLI intrarelazionali**](#vincoli-intrarelazionali)
+    - [**VINCOLI referenziali**](#vincoli-referenziali)
 
 ***
 
@@ -24,23 +27,6 @@
   - **Catalogo**: un database/schema che mantiene le informazioni su un altro database/schema, ovvero un **information schema**
 - L'utente diventa amministratore: stabilisce gli accessi di eventuali altri utenti al proprio **database** (su/do, super user);
   - **Trasmissione di privilegi**: l'amministratore può delegare.
-
-***
-
-## **VINCOLI**
-
-- Controllati durante le operazioni di modifica
-- Riguardano i valori ammissibili degli attributi di un record
-- **Vincoli Intrarelazionali**: nell'ambito della stessa relazione
-- **Vincoli Referenziali**: tra diverse relazioni
-- Possono avere effetti negativi sulla prestazione
-
-- In certi casi può essere utile limitare l'input stesso che un utente può inserire tramite una interfaccia: Vincola l'interfaccia che utilizza l'utente
-  - Es: una dropdown choice al posto di un keyboard input, limita l'input che può mettere
-
-- Vengono controllati durante le ```INSERT, DELETE, UPDATE```.
-- Devono essere sempre soddisfatti altrimenti la transazione fallisce
-- 
 
 ***
 
@@ -118,3 +104,47 @@ AS SMALLINT DEFAULT NULL
 CHECK (value >= 18 AND value <= 30)
 ```
 
+***
+
+## **VINCOLI**
+
+- Controllati durante le operazioni di modifica
+- Riguardano i valori ammissibili degli attributi di un record
+- **Vincoli Intrarelazionali**: nell'ambito della stessa relazione
+- **Vincoli Referenziali**: tra diverse relazioni
+- Possono avere effetti negativi sulla prestazione
+
+- In certi casi può essere utile limitare l'input stesso che un utente può inserire tramite una interfaccia: Vincola l'interfaccia che utilizza l'utente
+  - Es: una dropdown choice al posto di un keyboard input, limita l'input che può mettere
+
+- Vengono controllati durante le ```INSERT, DELETE, UPDATE```.
+- Devono essere sempre soddisfatti altrimenti la transazione fallisce
+- Servono a migliorare la qualità dei dati, arricchire la sintassi
+
+- Alcuni tipi: ```NOT NULL```, ```UNIQUE```, ```PRIMARY KEY```, ```CHECK```
+  - Nota: Primary Key implica ```NOT NULL```
+  - ```UNIQUE``` definisce chiavi
+
+- ```REFERENCES``` e ```FOREIGN KEY``` permettono di definire vincoli di integrità referenziale
+
+### **VINCOLI su un record**
+
+- ```NOT NULL```
+  - Implicito se l'attributo fa parte di una chiave primaria
+- ```CHECK [condizione]```
+  - specifica i valori ammissibili (es: ```voto CHECK (18>= voto AND <=31)```)
+  - Si può usare anche per attributi diversi dello stesso record
+- ```DEFAULT [costante | NULL]```
+  - Definisce quale sia il default di quel valore per ogni inserimento
+- CHECK
+
+### **VINCOLI intrarelazionali**
+
+- ```UNIQUE```
+  - L'attributo è una chiave
+- ```PRIMARY KEY [nome chiave] (attributo/i)```
+  - dove gli attributi devono essere dichiarati tutti NON NULL
+- ```UNIQUE (attributo/i)```
+  - definisce una chiave con più attributi
+
+### **VINCOLI referenziali**
